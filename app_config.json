@@ -1,0 +1,43 @@
+{
+    "assets": [
+        {
+            "ticker_symbol": "159985.SZ",
+            "remark": "豆粕ETF",
+            "buy_grid": 0.04,
+            "sell_grid": 0.04,
+            "take_profit_line": 0.15,
+            "cost_price": 1.9873,
+            "buy_price_alert": 1.9,
+            "sell_price_alert": 2.28,
+            "is_waiting_for_buy_input": false,
+            "is_waiting_for_sell_input": false,
+            "enabled": true
+        },
+        {
+            "ticker_symbol": "QQQ",
+            "remark": "纳指100ETF",
+            "buy_grid": 0.04,
+            "sell_grid": 0.04,
+            "take_profit_line": 0.15,
+            "cost_price": 415.0,
+            "buy_price_alert": 440.0,
+            "sell_price_alert": 588.64,
+            "is_waiting_for_buy_input": false,
+            "is_waiting_for_sell_input": false,
+            "enabled": false
+        },
+        {
+            "ticker_symbol": "SPY",
+            "remark": "标普500ETF",
+            "buy_grid": 0.05,
+            "sell_grid": 0.05,
+            "take_profit_line": 0.12,
+            "cost_price": 500.0,
+            "buy_price_alert": 490.0,
+            "sell_price_alert": 560.0,
+            "is_waiting_for_buy_input": false,
+            "is_waiting_for_sell_input": false,
+            "enabled": false
+        }
+    ]
+}

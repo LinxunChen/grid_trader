@@ -2,7 +2,7 @@ import yfinance as yf
 import time
 import json
 import csv
-from datetime import datetime, timedelta
+from datetime import datetime
 from financial_analyzer import update_analysis_cache
 
 # --- 文件路径常量 ---
@@ -29,48 +29,21 @@ def append_to_csv(row):
 
 # --- 核心逻辑 ---
 def get_stock_info(ticker_symbol):
-    """
-    获取ETF的最新价格和相关信息。
-    采用最精确的方法：手动加总过去一年的实际历史分红来计算股息率。
-    """
     try:
         stock = yf.Ticker(ticker_symbol)
         info = stock.info
-        
-        price = info.get('regularMarketPrice')
+        price = info.get('regularMarketPrice') or info.get('currentPrice')
         if price is None:
-            price = info.get('currentPrice')
-        if price is None:
-            hist = stock.history(period="2d") 
+            hist = stock.history(period="2d")
             if not hist.empty:
                 price = hist['Close'].iloc[-1]
-
+        
         pe_ratio = info.get('trailingPE')
-
-        # --- 最终的、最可靠的股息率计算逻辑 ---
-        dividend_yield = None
-        if price and price > 0:
-            dividends_history = stock.dividends
-            if not dividends_history.empty:
-                dividends_history.index = dividends_history.index.tz_localize(None)
-                one_year_ago = datetime.now() - timedelta(days=366)
-                dividends_last_year = dividends_history[dividends_history.index > one_year_ago]
-                
-                if not dividends_last_year.empty:
-                    sum_dividends = dividends_last_year.sum()
-                    dividend_yield = sum_dividends / price
-                else:
-                    dividend_yield = 0.0
-            else:
-                dividend_yield = 0.0
-
-        return {
-            "price": price,
-            "pe": pe_ratio,
-            "div_yield": dividend_yield
-        }
+        dividend_yield = info.get('dividendYield')
+        
+        return {"price": price, "pe": pe_ratio, "div_yield": dividend_yield}
     except Exception as e:
-        print(f"[{datetime.now():%H:%M:%S}] 获取 {ticker_symbol} 实时信息时发生严重错误: {e}")
+        print(f"[{datetime.now():%H:%M:%S}] 获取 {ticker_symbol} 价格时出错: {e}")
         return None
 
 def format_value(value, unit="", default_val="N/A"):
@@ -142,7 +115,7 @@ def monitor_asset(asset_state, analysis_data):
                f"当前价 {current_price:.2f} | "
                f"10年分位: {format_value(price_percentile, '%')} | "
                f"PE: {format_value(current_pe, '', 'N/A')} | "
-               f"股息率: {format_value(current_yield * 100 if current_yield is not None else None, '%', 'N/A')} | "
+               f"股息率: {format_value(current_yield * 100 if current_yield else None, '%', 'N/A')} | "
                f"买: {buy_alert:.2f} | "
                f"卖: {sell_alert:.2f}")
     print(log_msg)
@@ -227,8 +200,8 @@ def main():
             write_config(config)
             print("--- 状态已更新并保存到文件 ---")
         
-        print("\n--- 所有资产检查完毕，等待30秒... ---\n")
-        time.sleep(30)
+        print("\n--- 所有资产检查完毕，等待60秒... ---\n")
+        time.sleep(60) # --- 更新等待时间 ---
 
 if __name__ == "__main__":
     main()
