@@ -178,9 +178,18 @@ def main():
                 last_known_wait_states[symbol] = {'buy': False, 'sell': False}
                 continue
 
+            # --- 修正：提供更详细的等待日志 ---
             if is_currently_waiting_buy or is_currently_waiting_sell:
                 last_known_wait_states[symbol] = {'buy': is_currently_waiting_buy, 'sell': is_currently_waiting_sell}
-                print(f"[{datetime.now():%H:%M:%S}] {asset['remark']}({symbol}): 等待用户操作完成...")
+                
+                if is_currently_waiting_buy:
+                    op_type = "买入"
+                    trigger_price = asset['buy_price_alert']
+                else: # is_currently_waiting_sell
+                    op_type = "卖出"
+                    trigger_price = asset['sell_price_alert']
+                
+                print(f"[{datetime.now():%H:%M:%S}] {asset['remark']}({symbol}): 等待【{op_type}】操作完成 (触发价: {trigger_price:.2f})...")
                 continue
 
             asset_analysis_data = analysis_cache.get(symbol, {})
@@ -201,7 +210,7 @@ def main():
             print("--- 状态已更新并保存到文件 ---")
         
         print("\n--- 所有资产检查完毕，等待60秒... ---\n")
-        time.sleep(60) # --- 更新等待时间 ---
+        time.sleep(60)
 
 if __name__ == "__main__":
     main()

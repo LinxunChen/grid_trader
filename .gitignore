@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*build/
+*dist/
+*.egg-info/
+*.spec
+
+# macOS
+.DS_Store
+
+# Application specific
+analysis_cache.json
+transactions.csv
